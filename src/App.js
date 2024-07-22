@@ -9,10 +9,16 @@ export default function App() {
   };
 
   const randomID = (length) => {
-    return Math.random().toString(36).substring(2, 2 + length);
+    // Generate a random string of letters and numbers
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   };
 
-  const roomID = getUrlParams().get('roomID') || randomID(5);
+  const roomID = getUrlParams().get('roomID') || randomID(10); // Generate a random 10-character ID if no roomID in URL
 
   return (
     <div className='body' style={{ width: '100vw', height: '100vh' }}>
