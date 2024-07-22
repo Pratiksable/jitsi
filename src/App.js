@@ -1,43 +1,45 @@
-import * as React from 'react';
-import './App.css'
-import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
+import React from 'react';
+import './App.css';
+import { JitsiMeeting } from '@jitsi/react-sdk';
 
 export default function App() {
-  const roomID = "AlokTiwari";
-  let myMeeting = async (element) => {
-
- // generate Kit Token
- const appID = 1884422339;
- const serverSecret = "aac1a778919d8b4303947c36b353b911";
- const kitToken =  ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID,  Date.now().toString(),  "Alok Tiwari");
-
- // Create instance object from Kit Token.
- const zp = ZegoUIKitPrebuilt.create(kitToken);
- // start the call
- zp.joinRoom({
-        container: element,
-        sharedLinks: [
-          {
-            name: 'Personal link',
-            url:
-             window.location.protocol + '//' + 
-             window.location.host + window.location.pathname +
-              '?roomID=' +
-              roomID,
-          },
-        ],
-        scenario: {
-         mode: ZegoUIKitPrebuilt.VideoConference,
-        },
-   });
+  const getUrlParams = (url = window.location.href) => {
+    const urlStr = url.split('?')[1];
+    return new URLSearchParams(urlStr);
   };
 
-  return (
+  const randomID = (length) => {
+    return Math.random().toString(36).substring(2, 2 + length);
+  };
 
-    <div
-      className='body'
-      ref={myMeeting}
-      style={{ width: '100vw', height: '100vh'}}
-    ></div>
+  const roomID = getUrlParams().get('roomID') || randomID(5);
+
+  return (
+    <div className='body' style={{ width: '100vw', height: '100vh' }}>
+      <JitsiMeeting
+        domain="meet.jit.si"
+        roomName={roomID}
+        configOverwrite={{
+          startWithAudioMuted: true,
+          disableModeratorIndicator: true,
+          startScreenSharing: true,
+          enableEmailInStats: false,
+        }}
+        interfaceConfigOverwrite={{
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+        }}
+        userInfo={{
+          displayName: 'YOUR_USERNAME',
+        }}
+        onApiReady={(externalApi) => {
+          // Here you can attach custom event listeners to the Jitsi Meet External API
+          // You can also store it locally to execute commands
+        }}
+        getIFrameRef={(iframeRef) => { iframeRef.style.height = '100vh'; }}
+      />
+      <div style={{ position: 'absolute', bottom: '10px', width: '100%', textAlign: 'center' }}>
+        <p>Share this link to join the meeting: <a href={`${window.location.origin}?roomID=${roomID}`}>{window.location.origin}?roomID={roomID}</a></p>
+      </div>
+    </div>
   );
 }
